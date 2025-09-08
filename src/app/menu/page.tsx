@@ -34,7 +34,7 @@ export default function MenuPage() {
         {/* Tombol Level */}
         <div className="flex flex-col gap-6 w-48">
           <Link
-            href="/game/easy"
+            href="/game/level/easy"
             className="flex items-center justify-center gap-2 px-6 py-3 bg-green-600 rounded-xl text-white font-semibold shadow-md hover:bg-green-700 transition transform hover:scale-105"
           >
             <Leaf className="w-5 h-5" />
@@ -42,7 +42,7 @@ export default function MenuPage() {
           </Link>
 
           <Link
-            href="/game/medium"
+            href="/game/level/medium"
             className="flex items-center justify-center gap-2 px-6 py-3 bg-yellow-500 rounded-xl text-white font-semibold shadow-md hover:bg-yellow-600 transition transform hover:scale-105"
           >
             <Brain className="w-5 h-5" />
@@ -50,7 +50,7 @@ export default function MenuPage() {
           </Link>
 
           <Link
-            href="/game/hard"
+            href="/game/level/hard"
             className="flex items-center justify-center gap-2 px-6 py-3 bg-red-600 rounded-xl text-white font-semibold shadow-md hover:bg-red-700 transition transform hover:scale-105"
           >
             <Flame className="w-5 h-5" />
