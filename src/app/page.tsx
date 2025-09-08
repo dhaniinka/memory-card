@@ -1,103 +1,192 @@
+"use client";
+
+import Link from "next/link";
 import Image from "next/image";
+import { useEffect, useState, useRef } from "react";
+import { Play, FolderOpen, Users, Volume2, VolumeX } from "lucide-react";
 
-export default function Home() {
+export default function HomePage() {
+  const [progress, setProgress] = useState(0);
+  const [isPlaying, setIsPlaying] = useState(true);
+  const audioRef = useRef<HTMLAudioElement>(null);
+
+  // Progress bar looping terus
+  useEffect(() => {
+    const timer = setInterval(() => {
+      setProgress((prev) => (prev >= 100 ? 0 : prev + 1));
+    }, 500); // 10 detik penuh
+    return () => clearInterval(timer);
+  }, []);
+
+  // Toggle musik
+  const toggleMusic = () => {
+    if (!audioRef.current) return;
+    if (isPlaying) audioRef.current.pause();
+    else audioRef.current.play();
+    setIsPlaying(!isPlaying);
+  };
+
   return (
-    <div className="font-sans grid grid-rows-[20px_1fr_20px] items-center justify-items-center min-h-screen p-8 pb-20 gap-16 sm:p-20">
-      <main className="flex flex-col gap-[32px] row-start-2 items-center sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={180}
-          height={38}
-          priority
-        />
-        <ol className="font-mono list-inside list-decimal text-sm/6 text-center sm:text-left">
-          <li className="mb-2 tracking-[-.01em]">
-            Get started by editing{" "}
-            <code className="bg-black/[.05] dark:bg-white/[.06] font-mono font-semibold px-1 py-0.5 rounded">
-              src/app/page.tsx
-            </code>
-            .
-          </li>
-          <li className="tracking-[-.01em]">
-            Save and see your changes instantly.
-          </li>
-        </ol>
+    <div
+      className="relative flex flex-col items-center justify-center min-h-screen text-white overflow-hidden"
+      style={{
+        backgroundImage: "url('/bg-hijau.jpeg')",
+        backgroundSize: "cover",
+        backgroundPosition: "center",
+      }}
+    >
+      {/* 🎵 Backsound */}
+      <audio ref={audioRef} loop autoPlay>
+        <source src="/audio/backsound.mp3" type="audio/mpeg" />
+      </audio>
+      <button
+        onClick={toggleMusic}
+        className="absolute top-4 right-4 bg-black/40 px-3 py-2 rounded-lg text-lg shadow-md hover:scale-110 transition"
+      >
+        {isPlaying ? <Volume2 size={24} /> : <VolumeX size={24} />}
+      </button>
 
-        <div className="flex gap-4 items-center flex-col sm:flex-row">
-          <a
-            className="rounded-full border border-solid border-transparent transition-colors flex items-center justify-center bg-foreground text-background gap-2 hover:bg-[#383838] dark:hover:bg-[#ccc] font-medium text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 sm:w-auto"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={20}
-              height={20}
-            />
-            Deploy now
-          </a>
-          <a
-            className="rounded-full border border-solid border-black/[.08] dark:border-white/[.145] transition-colors flex items-center justify-center hover:bg-[#f2f2f2] dark:hover:bg-[#1a1a1a] hover:border-transparent font-medium text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 w-full sm:w-auto md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Read our docs
-          </a>
-        </div>
-      </main>
-      <footer className="row-start-3 flex gap-[24px] flex-wrap items-center justify-center">
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
+      {/* 🃏 Dekorasi kartu kiri */}
+      <div className="absolute left-24 top-1/2 -translate-y-1/2 flex flex-row space-x-[-60px] animate-sway">
+        <Image
+          src="/images/easyback.png"
+          alt="card back"
+          width={150}
+          height={220}
+          className="opacity-50 rotate-[-15deg] drop-shadow-lg animate-zoomSlow"
+        />
+        <Image
+          src="/images/easyback.png"
+          alt="card back"
+          width={150}
+          height={220}
+          className="opacity-80 rotate-[-5deg] drop-shadow-lg animate-zoomSlow"
+        />
+        <Image
+          src="/images/easyback.png"
+          alt="card back"
+          width={150}
+          height={220}
+          className="opacity-100 rotate-[5deg] drop-shadow-lg animate-zoomSlow"
+        />
+      </div>
+
+      {/* 🃏 Dekorasi kartu kanan */}
+      <div className="absolute right-24 top-1/2 -translate-y-1/2 flex flex-row-reverse space-x-[-60px] space-x-reverse animate-sway">
+        <Image
+          src="/images/pisjo.png"
+          alt="card front"
+          width={150}
+          height={220}
+          className="opacity-50 rotate-[15deg] drop-shadow-lg animate-zoomSlow"
+        />
+        <Image
+          src="/images/pisjo.png"
+          alt="card front"
+          width={150}
+          height={220}
+          className="opacity-80 rotate-[5deg] drop-shadow-lg animate-zoomSlow"
+        />
+        <Image
+          src="/images/pisjo.png"
+          alt="card front"
+          width={150}
+          height={220}
+          className="opacity-100 rotate-[-5deg] drop-shadow-lg animate-zoomSlow"
+        />
+      </div>
+
+      {/* ✨ Judul */}
+      <h1
+        className="text-6xl font-extrabold mb-6 tracking-widest animate-pulse"
+        style={{
+          color: "#FCB53B",
+          textShadow: "3px 3px 8px rgba(0,0,0,0.7)",
+        }}
+      >
+        GAME START
+      </h1>
+
+      {/* ⚡ Progress bar */}
+      <div
+        className="w-72 h-5 rounded-full overflow-hidden mb-6 relative"
+        style={{ backgroundColor: "#B45253" }}
+      >
+        <div
+          className="h-full transition-all duration-100"
+          style={{
+            width: `${progress}%`,
+            backgroundColor: "#FFE797",
+          }}
+        ></div>
+        <span
+          className="absolute inset-0 flex items-center justify-center text-xs font-bold"
+          style={{ color: "black" }}
         >
-          <Image
-            aria-hidden
-            src="/file.svg"
-            alt="File icon"
-            width={16}
-            height={16}
-          />
-          Learn
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
+          {progress}%
+        </span>
+      </div>
+
+      {/* Teks kecil kedip */}
+      <p
+        className="mb-10 animate-pulse text-sm font-bold tracking-widest"
+        style={{ color: "#FFE797" }}
+      >
+        PRESS PLAY TO START
+      </p>
+
+      {/* Tombol */}
+      <div className="flex gap-6">
+        <Link
+          href="/game/level/easy"
+          className="flex items-center gap-2 px-6 py-3 text-lg font-bold rounded-xl shadow-md bg-green-500 text-white hover:bg-green-600 transition transform hover:scale-110"
         >
-          <Image
-            aria-hidden
-            src="/window.svg"
-            alt="Window icon"
-            width={16}
-            height={16}
-          />
-          Examples
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
+          <Play size={20} /> Play
+        </Link>
+
+        <Link
+          href="/menu"
+          className="flex items-center gap-2 px-6 py-3 text-lg font-bold rounded-xl shadow-md bg-yellow-400 text-black hover:bg-yellow-500 transition transform hover:scale-110"
         >
-          <Image
-            aria-hidden
-            src="/globe.svg"
-            alt="Globe icon"
-            width={16}
-            height={16}
-          />
-          Go to nextjs.org →
-        </a>
-      </footer>
+          <FolderOpen size={20} /> Menu
+        </Link>
+
+        <Link
+          href="/about"
+          className="flex items-center gap-2 px-6 py-3 text-lg font-bold rounded-xl shadow-md bg-orange-500 text-white hover:bg-orange-600 transition transform hover:scale-110"
+        >
+          <Users size={20} /> About Us
+        </Link>
+      </div>
+
+      {/* 🔧 Animasi custom */}
+      <style jsx>{`
+        @keyframes sway {
+          0%,
+          100% {
+            transform: translateY(-50%) rotate(0deg);
+          }
+          50% {
+            transform: translateY(-52%) rotate(2deg);
+          }
+        }
+        .animate-sway {
+          animation: sway 4s ease-in-out infinite;
+        }
+
+        @keyframes zoomSlow {
+          0%,
+          100% {
+            transform: scale(1);
+          }
+          50% {
+            transform: scale(1.05);
+          }
+        }
+        .animate-zoomSlow {
+          animation: zoomSlow 6s ease-in-out infinite;
+        }
+      `}</style>
     </div>
   );
 }
