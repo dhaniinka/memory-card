@@ -1,8 +1,8 @@
 "use client";
-import { useEffect, useState } from "react";
-import Image from "next/image";
+import { useEffect, useState, useRef } from "react";
 import Link from "next/link";
 import { RefreshCcw, Home, Clock, Star } from "lucide-react";
+import Card from "../../../components/card"; // pastikan path sesuai
 
 const cardImages = [
   { src: "/images/easy/klepon.png", matched: false },
@@ -20,14 +20,19 @@ export default function EasyLevel() {
   const [disabled, setDisabled] = useState(false);
   const [score, setScore] = useState(0);
   const [time, setTime] = useState(0);
+  const [gameOver, setGameOver] = useState(false);
+
+  const matchSoundRef = useRef<HTMLAudioElement | null>(null);
+  const winSoundRef = useRef<HTMLAudioElement | null>(null);
 
   // Timer
   useEffect(() => {
+    if (gameOver) return;
     const timer = setInterval(() => {
       setTime((t) => t + 1);
     }, 1000);
     return () => clearInterval(timer);
-  }, []);
+  }, [gameOver]);
 
   // Shuffle kartu
   const shuffleCards = () => {
@@ -39,6 +44,7 @@ export default function EasyLevel() {
     setSecondChoice(null);
     setScore(0);
     setTime(0);
+    setGameOver(false);
   };
 
   useEffect(() => {
@@ -47,7 +53,7 @@ export default function EasyLevel() {
 
   // Handle pilihan kartu
   const handleChoice = (card: any) => {
-    if (!disabled) {
+    if (!disabled && !card.matched && card !== firstChoice) {
       firstChoice ? setSecondChoice(card) : setFirstChoice(card);
     }
   };
@@ -57,22 +63,29 @@ export default function EasyLevel() {
     if (firstChoice && secondChoice) {
       setDisabled(true);
       if (firstChoice.src === secondChoice.src) {
-        setCards((prevCards) => {
-          return prevCards.map((card) => {
-            if (card.src === firstChoice.src) {
-              return { ...card, matched: true };
-            } else {
-              return card;
-            }
-          });
-        });
+        setCards((prevCards) =>
+          prevCards.map((card) =>
+            card.src === firstChoice.src ? { ...card, matched: true } : card
+          )
+        );
         setScore((prev) => prev + 1);
+
+        matchSoundRef.current?.play();
+
         resetTurn();
       } else {
         setTimeout(() => resetTurn(), 1000);
       }
     }
   }, [firstChoice, secondChoice]);
+
+  // Cek game selesai
+  useEffect(() => {
+    if (cards.length > 0 && cards.every((card) => card.matched)) {
+      setGameOver(true);
+      winSoundRef.current?.play();
+    }
+  }, [cards]);
 
   // Reset pilihan
   const resetTurn = () => {
@@ -82,7 +95,11 @@ export default function EasyLevel() {
   };
 
   return (
-    <div className="flex flex-col items-center justify-center min-h-screen bg-white">
+    <div className="flex flex-col items-center justify-center min-h-screen bg-white relative">
+      {/* Suara */}
+      <audio ref={matchSoundRef} src="/sounds/match.mp3" />
+      <audio ref={winSoundRef} src="/sounds/win.mp3" />
+
       {/* Header */}
       <div className="flex justify-between items-center w-full max-w-xl px-6 py-4">
         <div className="bg-[#E78A8A] text-white px-4 py-2 rounded-full flex items-center gap-2">
@@ -95,23 +112,17 @@ export default function EasyLevel() {
       </div>
 
       {/* Grid kartu */}
-      <div className="grid grid-cols-4 gap-6 mt-6">
+      <div className="grid grid-cols-4 gap-4 mt-6">
         {cards.map((card) => {
           const isFlipped =
             card.matched || card === firstChoice || card === secondChoice;
           return (
-            <div
+            <Card
               key={card.id}
-              onClick={() => handleChoice(card)}
-              className="w-36 h-48 cursor-pointer relative"
-            >
-              <Image
-                src={isFlipped ? card.src : "/back.png"}
-                alt="card"
-                fill
-                className="object-cover rounded-lg"
-              />
-            </div>
+              card={card}
+              isFlipped={isFlipped}
+              handleChoice={handleChoice}
+            />
           );
         })}
       </div>
@@ -131,6 +142,35 @@ export default function EasyLevel() {
           <Home className="w-5 h-5" /> Menu
         </Link>
       </div>
+
+      {/* Pop-up Congrats */}
+      {gameOver && (
+        <div className="absolute inset-0 flex items-center justify-center bg-black/60">
+          <div className="bg-white rounded-2xl p-8 text-center shadow-xl">
+            <h2 className="text-3xl font-bold text-[#FCB53B]">🎉 Congrats!</h2>
+            <p className="mt-2 text-lg text-gray-700">
+              Kamu berhasil menyelesaikan level ini.
+            </p>
+            <p className="mt-2 text-sm text-gray-500">
+              Waktu: {time}s | Skor: {score}
+            </p>
+            <div className="flex gap-4 justify-center mt-6">
+              <button
+                onClick={shuffleCards}
+                className="px-5 py-2 bg-[#B45253] text-white rounded-full shadow-md hover:scale-105 transition"
+              >
+                Main Lagi
+              </button>
+              <Link
+                href="/menu"
+                className="px-5 py-2 bg-[#FCB53B] text-white rounded-full shadow-md hover:scale-105 transition"
+              >
+                Menu
+              </Link>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

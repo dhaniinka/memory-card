@@ -1,46 +1,51 @@
 "use client";
 
 import Image from "next/image";
+import { motion } from "framer-motion";
 
-export default function Card({ card, handleChoice, flipped }: any) {
+interface CardProps {
+  card: { id: number; src: string; matched: boolean };
+  isFlipped: boolean;
+  handleChoice: (card: any) => void;
+}
+
+export default function Card({ card, isFlipped, handleChoice }: CardProps) {
   const handleClick = () => {
-    if (!flipped) {
+    if (!isFlipped) {
       handleChoice(card);
     }
   };
 
   return (
-    <div className="relative w-36 h-48 cursor-pointer perspective"> {/* lebih besar */}
-      <div
-        className={`relative w-full h-full duration-500 transform-style-preserve-3d ${
-          flipped ? "rotate-y-180" : ""
-        }`}
+    <div
+      className="w-24 aspect-[3/4] sm:w-28 md:w-32 cursor-pointer relative perspective"
+      onClick={handleClick}
+    >
+      <motion.div
+        className="relative w-full h-full preserve-3d"
+        animate={{ rotateY: isFlipped ? 180 : 0 }}
+        transition={{ duration: 0.6 }}
       >
-        {/* Depan kartu */}
-        <div className="absolute w-full h-full backface-hidden rounded-xl overflow-hidden shadow-lg">
+        {/* Back */}
+        <div className="absolute w-full h-full backface-hidden">
           <Image
-            src={card.src}
-            alt="card front"
-            width={200}
-            height={260}
-            className="w-full h-full object-cover"
+            src="/back.png"
+            alt="back card"
+            fill
+            className="object-contain rounded-xl"
           />
         </div>
 
-        {/* Belakang kartu */}
-        <div
-          onClick={handleClick}
-          className="absolute w-full h-full backface-hidden rotate-y-180 rounded-xl overflow-hidden shadow-lg"
-        >
+        {/* Front */}
+        <div className="absolute w-full h-full rotate-y-180 backface-hidden">
           <Image
-            src="/images/card-back.png"
-            alt="card back"
-            width={200}
-            height={260}
-            className="w-full h-full object-cover"
+            src={card.src}
+            alt="front card"
+            fill
+            className="object-contain rounded-xl"
           />
         </div>
-      </div>
+      </motion.div>
     </div>
   );
 }

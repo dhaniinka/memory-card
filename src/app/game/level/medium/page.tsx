@@ -1,151 +1,184 @@
 "use client";
-
-import { useState, useEffect } from "react";
+import { useEffect, useState, useRef } from "react";
 import Link from "next/link";
-import Card from "../../../components/card"; // sama kaya easy, pake Card.tsx
-import { RefreshCcw, FolderOpen, Timer, Star, Leaf } from "lucide-react";
+import { RefreshCcw, Home, Clock, Star } from "lucide-react";
+import Card from "../../../components/card"; // pastikan path sesuai
 
-// Tambah lebih banyak gambar untuk mode Medium
+// Daftar gambar level Medium
 const cardImages = [
-  { src: "/cards/pisangijo.png", matched: false },
-  { src: "/cards/klepon.png", matched: false },
-  { src: "/cards/getuk.png", matched: false },
-  { src: "/cards/lupis.png", matched: false },
-  { src: "/cards/serabi.png", matched: false },
-  { src: "/cards/wajik.png", matched: false },
-  { src: "/cards/dadar.png", matched: false },
-  { src: "/cards/nagasari.png", matched: false },
-  { src: "/cards/cenil.png", matched: false },
-  { src: "/cards/apem.png", matched: false },
-  { src: "/cards/jemblem.png", matched: false },
-  { src: "/cards/kueku.png", matched: false },
+  { src: "/images/medium/klepon.png", matched: false },
+  { src: "/images/medium/arumanis.png", matched: false },
+  { src: "/images/medium/pisjo.png", matched: false },
+  { src: "/images/medium/pukis.png", matched: false },
+  { src: "/images/medium/risol.png", matched: false },
+  { src: "/images/medium/serabi.png", matched: false },
+  { src: "/images/medium/getuk.png", matched: false },
+  { src: "/images/medium/lupis.png", matched: false },
+  { src: "/images/medium/onde.png", matched: false },
+  { src: "/images/medium/cireng.png", matched: false },
+  { src: "/images/medium/bolu.png", matched: false },
+  { src: "/images/medium/putu.png", matched: false },
 ];
 
-export default function GameMedium() {
+export default function MediumLevel() {
   const [cards, setCards] = useState<any[]>([]);
-  const [choiceOne, setChoiceOne] = useState<any>(null);
-  const [choiceTwo, setChoiceTwo] = useState<any>(null);
+  const [firstChoice, setFirstChoice] = useState<any>(null);
+  const [secondChoice, setSecondChoice] = useState<any>(null);
   const [disabled, setDisabled] = useState(false);
   const [score, setScore] = useState(0);
-  const [timeLeft, setTimeLeft] = useState(90); // 90 detik
+  const [time, setTime] = useState(0);
+  const [gameOver, setGameOver] = useState(false);
 
-  // Shuffle cards saat start
+  const matchSoundRef = useRef<HTMLAudioElement | null>(null);
+  const winSoundRef = useRef<HTMLAudioElement | null>(null);
+
+  // Timer
+  useEffect(() => {
+    if (gameOver) return;
+    const timer = setInterval(() => {
+      setTime((t) => t + 1);
+    }, 1000);
+    return () => clearInterval(timer);
+  }, [gameOver]);
+
+  // Shuffle kartu
   const shuffleCards = () => {
-    const shuffled = [...cardImages, ...cardImages]
+    const shuffledCards = [...cardImages, ...cardImages]
       .sort(() => Math.random() - 0.5)
       .map((card) => ({ ...card, id: Math.random() }));
-    setChoiceOne(null);
-    setChoiceTwo(null);
-    setCards(shuffled);
+    setCards(shuffledCards);
+    setFirstChoice(null);
+    setSecondChoice(null);
     setScore(0);
-    setTimeLeft(90);
+    setTime(0);
+    setGameOver(false);
   };
 
-  // Pilih kartu
-  const handleChoice = (card: any) => {
-    if (!disabled) {
-      choiceOne ? setChoiceTwo(card) : setChoiceOne(card);
-    }
-  };
-
-  // Cek match
-  useEffect(() => {
-    if (choiceOne && choiceTwo) {
-      setDisabled(true);
-      if (choiceOne.src === choiceTwo.src) {
-        setCards((prev) =>
-          prev.map((card) =>
-            card.src === choiceOne.src ? { ...card, matched: true } : card
-          )
-        );
-        setScore((prev) => prev + 10);
-        resetTurn();
-      } else {
-        setTimeout(() => {
-          setScore((prev) => (prev > 0 ? prev - 2 : 0));
-          resetTurn();
-        }, 1000);
-      }
-    }
-  }, [choiceOne, choiceTwo]);
-
-  // Timer jalan
-  useEffect(() => {
-    if (timeLeft > 0) {
-      const timer = setInterval(() => {
-        setTimeLeft((prev) => prev - 1);
-      }, 1000);
-      return () => clearInterval(timer);
-    }
-  }, [timeLeft]);
-
-  // Reset pilihan
-  const resetTurn = () => {
-    setChoiceOne(null);
-    setChoiceTwo(null);
-    setDisabled(false);
-  };
-
-  // Auto mulai game saat buka halaman
   useEffect(() => {
     shuffleCards();
   }, []);
 
+  // Handle pilihan kartu
+  const handleChoice = (card: any) => {
+    if (!disabled && !card.matched && card !== firstChoice) {
+      firstChoice ? setSecondChoice(card) : setFirstChoice(card);
+    }
+  };
+
+  // Bandingkan kartu
+  useEffect(() => {
+    if (firstChoice && secondChoice) {
+      setDisabled(true);
+      if (firstChoice.src === secondChoice.src) {
+        setCards((prevCards) =>
+          prevCards.map((card) =>
+            card.src === firstChoice.src ? { ...card, matched: true } : card
+          )
+        );
+        setScore((prev) => prev + 1);
+
+        // mainkan suara match
+        matchSoundRef.current?.play();
+
+        resetTurn();
+      } else {
+        setTimeout(() => resetTurn(), 1000);
+      }
+    }
+  }, [firstChoice, secondChoice]);
+
+  // Cek game selesai
+  useEffect(() => {
+    if (cards.length > 0 && cards.every((card) => card.matched)) {
+      setGameOver(true);
+      winSoundRef.current?.play();
+    }
+  }, [cards]);
+
+  // Reset pilihan
+  const resetTurn = () => {
+    setFirstChoice(null);
+    setSecondChoice(null);
+    setDisabled(false);
+  };
+
   return (
-    <div
-      className="flex flex-col items-center justify-center min-h-screen text-white px-4"
-      style={{
-        backgroundImage: "url('/bg-hijau.jpeg')",
-        backgroundSize: "cover",
-        backgroundPosition: "center",
-      }}
-    >
-      {/* Header status */}
-      <div className="flex justify-between items-center w-full max-w-5xl mb-6">
-        {/* Timer (kiri) */}
-        <p className="text-xl font-semibold flex items-center gap-2">
-          <Timer className="w-6 h-6 text-yellow-300" /> {timeLeft}s
-        </p>
+    <div className="flex flex-col items-center justify-center min-h-screen bg-white relative">
+      {/* Suara */}
+      <audio ref={matchSoundRef} src="/sounds/match.mp3" />
+      <audio ref={winSoundRef} src="/sounds/win.mp3" />
 
-        {/* Judul (tengah) */}
-        <h1 className="text-3xl font-bold flex items-center gap-2 text-center">
-          <Leaf className="w-8 h-8 text-green-300" /> Medium Mode
-        </h1>
-
-        {/* Score (kanan) */}
-        <p className="text-xl font-semibold flex items-center gap-2">
-          <Star className="w-6 h-6 text-yellow-300" /> {score}
-        </p>
+      {/* Header */}
+      <div className="flex justify-between items-center w-full max-w-3xl px-6 py-4">
+        <div className="bg-[#E78A8A] text-white px-4 py-2 rounded-full flex items-center gap-2">
+          <Clock className="w-5 h-5" /> {time}s
+        </div>
+        <h2 className="text-3xl font-bold text-[#FCB53B]">LEVEL MEDIUM</h2>
+        <div className="bg-[#E78A8A] text-white px-4 py-2 rounded-full flex items-center gap-2">
+          <Star className="w-5 h-5" /> {score}
+        </div>
       </div>
 
-      {/* Grid kartu 5x5 */}
-      <div className="grid grid-cols-5 gap-6 max-w-5xl">
-        {cards.map((card) => (
-          <Card
-            key={card.id}
-            card={card}
-            flipped={card === choiceOne || card === choiceTwo || card.matched}
-            handleChoice={handleChoice}
-          />
-        ))}
+      {/* Grid kartu */}
+      <div className="grid grid-cols-6 gap-4 mt-6">
+        {cards.map((card) => {
+          const isFlipped =
+            card.matched || card === firstChoice || card === secondChoice;
+          return (
+            <Card
+              key={card.id}
+              card={card}
+              isFlipped={isFlipped}
+              handleChoice={handleChoice}
+            />
+          );
+        })}
       </div>
 
-      {/* Tombol kontrol */}
-      <div className="flex gap-4 mt-10">
+      {/* Tombol bawah */}
+      <div className="flex gap-6 mt-10">
         <button
           onClick={shuffleCards}
-          className="px-6 py-3 bg-yellow-500 text-black font-bold rounded-lg hover:bg-yellow-600 flex items-center gap-2"
+          className="px-6 py-3 bg-[#B45253] text-white rounded-full font-bold shadow-lg hover:scale-105 transition flex items-center gap-2"
         >
           <RefreshCcw className="w-5 h-5" /> Restart
         </button>
-
         <Link
           href="/menu"
-          className="px-6 py-3 bg-red-500 text-white font-bold rounded-lg hover:bg-red-600 flex items-center gap-2"
+          className="px-6 py-3 bg-[#FCB53B] text-white rounded-full font-bold shadow-lg hover:scale-105 transition flex items-center gap-2"
         >
-          <FolderOpen className="w-5 h-5" /> Menu
+          <Home className="w-5 h-5" /> Menu
         </Link>
       </div>
+
+      {/* Pop-up Congrats */}
+      {gameOver && (
+        <div className="absolute inset-0 flex items-center justify-center bg-black/60">
+          <div className="bg-white rounded-2xl p-8 text-center shadow-xl">
+            <h2 className="text-3xl font-bold text-[#FCB53B]">🎉 Congrats!</h2>
+            <p className="mt-2 text-lg text-gray-700">
+              Kamu berhasil menyelesaikan level ini.
+            </p>
+            <p className="mt-2 text-sm text-gray-500">
+              Waktu: {time}s | Skor: {score}
+            </p>
+            <div className="flex gap-4 justify-center mt-6">
+              <button
+                onClick={shuffleCards}
+                className="px-5 py-2 bg-[#B45253] text-white rounded-full shadow-md hover:scale-105 transition"
+              >
+                Main Lagi
+              </button>
+              <Link
+                href="/menu"
+                className="px-5 py-2 bg-[#FCB53B] text-white rounded-full shadow-md hover:scale-105 transition"
+              >
+                Menu
+              </Link>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

@@ -82,7 +82,7 @@ export default function MenuPage() {
       </nav>
 
       {/* Judul */}
-      <div className="flex flex-col items-center mt-20">
+      <div className="flex flex-col items-center mt-15">
         <h2 className="text-[#FCB53B] font-extrabold text-5xl drop-shadow-lg">
           CHOOSE LEVEL
         </h2>
@@ -95,7 +95,7 @@ export default function MenuPage() {
       <div className="flex flex-col gap-6 mt-14 w-[85%] max-w-md mx-auto">
         {/* Easy */}
         <Link
-          href="/game/easy"
+          href="/game/level/easy"
           className="flex items-center justify-center gap-x-3 px-6 py-3 rounded-full bg-[#FFE797] text-[#B45253] font-bold text-xl shadow-md hover:scale-105 transition"
         >
           <span>Easy</span>
@@ -110,7 +110,7 @@ export default function MenuPage() {
 
         {/* Medium */}
         <Link
-          href="/game/medium"
+          href="/game/level/medium"
           className="flex items-center justify-center gap-x-3 px-6 py-3 rounded-full bg-[#FCB53B] text-white font-bold text-xl shadow-md hover:scale-105 transition"
         >
           <Image
@@ -125,7 +125,7 @@ export default function MenuPage() {
 
         {/* Hard */}
         <Link
-          href="/game/hard"
+          href="/game/level/hard"
           className="flex items-center justify-center gap-x-3 px-6 py-3 rounded-full bg-[#B45253] text-white font-bold text-xl shadow-md hover:scale-105 transition"
         >
           <span>Hard</span>
