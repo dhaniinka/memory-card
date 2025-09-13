@@ -2,23 +2,22 @@
 
 import Link from "next/link";
 import Image from "next/image";
-import { useEffect, useState, useRef } from "react";
-import { Play, FolderOpen, Users, Volume2, VolumeX } from "lucide-react";
+import { useState, useRef } from "react";
+import { Volume2, VolumeX } from "lucide-react";
+import { Jua } from "next/font/google";
+import { usePathname } from "next/navigation";
+
+// Font Jua
+const jua = Jua({
+  weight: "400",
+  subsets: ["latin"],
+});
 
 export default function HomePage() {
-  const [progress, setProgress] = useState(0);
   const [isPlaying, setIsPlaying] = useState(true);
   const audioRef = useRef<HTMLAudioElement>(null);
+  const pathname = usePathname();
 
-  // Progress bar looping terus
-  useEffect(() => {
-    const timer = setInterval(() => {
-      setProgress((prev) => (prev >= 100 ? 0 : prev + 1));
-    }, 500); // 10 detik penuh
-    return () => clearInterval(timer);
-  }, []);
-
-  // Toggle musik
   const toggleMusic = () => {
     if (!audioRef.current) return;
     if (isPlaying) audioRef.current.pause();
@@ -26,167 +25,103 @@ export default function HomePage() {
     setIsPlaying(!isPlaying);
   };
 
+  const navItems = [
+    { name: "Home", path: "/" },
+    { name: "About Us", path: "/about" },
+    { name: "Menu", path: "/menu" },
+    { name: "Game Info", path: "/gameinfo" },
+  ];
+
+  // list gambar
+  const cardImages = [
+    { src: "/images/easy/klepon.png", alt: "Klepon" },
+    { src: "/images/easy/arumanis.png", alt: "Arumanis" },
+    { src: "/images/easy/risol.png", alt: "Risol" },
+    { src: "/images/easy/pisjo.png", alt: "Pisang Ijo" },
+    { src: "/images/easy/pukis.png", alt: "Pukis" },
+    { src: "/images/easy/serabi.png", alt: "Serabi" },
+  ];
+
   return (
     <div
-      className="relative flex flex-col items-center justify-center min-h-screen text-white overflow-hidden"
+      className={`flex flex-col items-center min-h-screen ${jua.className}`}
       style={{
         backgroundImage: "url('/bg-hijau.jpeg')",
         backgroundSize: "cover",
         backgroundPosition: "center",
       }}
     >
-      {/* 🎵 Backsound */}
-      <audio ref={audioRef} loop autoPlay>
-        <source src="/audio/backsound.mp3" type="audio/mpeg" />
-      </audio>
-      <button
-        onClick={toggleMusic}
-        className="absolute top-4 right-4 bg-black/40 px-3 py-2 rounded-lg text-lg shadow-md hover:scale-110 transition"
-      >
-        {isPlaying ? <Volume2 size={24} /> : <VolumeX size={24} />}
-      </button>
+      {/* Musik */}
+      <audio ref={audioRef} src="/backsound.mp3" autoPlay loop />
 
-      {/* 🃏 Dekorasi kartu kiri */}
-      <div className="absolute left-24 top-1/2 -translate-y-1/2 flex flex-row space-x-[-60px] animate-sway">
-        <Image
-          src="/images/easyback.png"
-          alt="card back"
-          width={150}
-          height={220}
-          className="opacity-50 rotate-[-15deg] drop-shadow-lg animate-zoomSlow"
-        />
-        <Image
-          src="/images/easyback.png"
-          alt="card back"
-          width={150}
-          height={220}
-          className="opacity-80 rotate-[-5deg] drop-shadow-lg animate-zoomSlow"
-        />
-        <Image
-          src="/images/easyback.png"
-          alt="card back"
-          width={150}
-          height={220}
-          className="opacity-100 rotate-[5deg] drop-shadow-lg animate-zoomSlow"
-        />
-      </div>
+      {/* Navbar */}
+      <nav className="w-full flex items-center justify-between px-8 py-4 bg-[#D9D9D9]/20">
+        <Image src="/logo.png" alt="Logo" width={70} height={70} />
 
-      {/* 🃏 Dekorasi kartu kanan */}
-      <div className="absolute right-24 top-1/2 -translate-y-1/2 flex flex-row-reverse space-x-[-60px] space-x-reverse animate-sway">
-        <Image
-          src="/images/pisjo.png"
-          alt="card front"
-          width={150}
-          height={220}
-          className="opacity-50 rotate-[15deg] drop-shadow-lg animate-zoomSlow"
-        />
-        <Image
-          src="/images/pisjo.png"
-          alt="card front"
-          width={150}
-          height={220}
-          className="opacity-80 rotate-[5deg] drop-shadow-lg animate-zoomSlow"
-        />
-        <Image
-          src="/images/pisjo.png"
-          alt="card front"
-          width={150}
-          height={220}
-          className="opacity-100 rotate-[-5deg] drop-shadow-lg animate-zoomSlow"
-        />
-      </div>
+        <ul className="flex gap-10 text-white text-lg font-medium">
+          {navItems.map((item) => (
+            <li key={item.name}>
+              <Link
+                href={item.path}
+                className={`relative px-2 py-1 ${
+                  pathname === item.path
+                    ? "after:content-[''] after:absolute after:left-0 after:bottom-0 after:w-full after:h-[3px] after:bg-[#B45253]"
+                    : "hover:after:content-[''] hover:after:absolute hover:after:left-0 hover:after:bottom-0 hover:w-full hover:h-[3px] hover:after:bg-[#B45253] after:transition-all after:duration-300"
+                }`}
+              >
+                {item.name}
+              </Link>
+            </li>
+          ))}
+        </ul>
 
-      {/* ✨ Judul */}
-      <h1
-        className="text-6xl font-extrabold mb-6 tracking-widest animate-pulse"
-        style={{
-          color: "#FCB53B",
-          textShadow: "3px 3px 8px rgba(0,0,0,0.7)",
-        }}
-      >
-        GAME START
-      </h1>
-
-      {/* ⚡ Progress bar */}
-      <div
-        className="w-72 h-5 rounded-full overflow-hidden mb-6 relative"
-        style={{ backgroundColor: "#B45253" }}
-      >
-        <div
-          className="h-full transition-all duration-100"
-          style={{
-            width: `${progress}%`,
-            backgroundColor: "#FFE797",
-          }}
-        ></div>
-        <span
-          className="absolute inset-0 flex items-center justify-center text-xs font-bold"
-          style={{ color: "black" }}
+        <button
+          onClick={toggleMusic}
+          className="p-3 rounded-full bg-[#FFE797] hover:bg-[#FCB53B] shadow-md transition"
         >
-          {progress}%
-        </span>
-      </div>
+          {isPlaying ? (
+            <Volume2 className="text-[#B45253] w-6 h-6" />
+          ) : (
+            <VolumeX className="text-[#B45253] w-6 h-6" />
+          )}
+        </button>
+      </nav>
 
-      {/* Teks kecil kedip */}
-      <p
-        className="mb-10 animate-pulse text-sm font-bold tracking-widest"
-        style={{ color: "#FFE797" }}
-      >
-        PRESS PLAY TO START
-      </p>
-
-      {/* Tombol */}
-      <div className="flex gap-6">
+      {/* Title */}
+      <div className="flex flex-col items-center mt-20">
+        <h1 className="text-5xl font-bold text-[#FCB53B]">MEMORY GAME</h1>
         <Link
           href="/game/level/easy"
-          className="flex items-center gap-2 px-6 py-3 text-lg font-bold rounded-xl shadow-md bg-green-500 text-white hover:bg-green-600 transition transform hover:scale-110"
+          className="mt-6 bg-[#FFE797] hover:bg-[#FCB53B] text-[#B45253] font-semibold px-10 py-3 rounded-full shadow-lg transition"
         >
-          <Play size={20} /> Play
+          PLAY
         </Link>
-
-        <Link
-          href="/menu"
-          className="flex items-center gap-2 px-6 py-3 text-lg font-bold rounded-xl shadow-md bg-yellow-400 text-black hover:bg-yellow-500 transition transform hover:scale-110"
-        >
-          <FolderOpen size={20} /> Menu
-        </Link>
-
-        <Link
-          href="/about"
-          className="flex items-center gap-2 px-6 py-3 text-lg font-bold rounded-xl shadow-md bg-orange-500 text-white hover:bg-orange-600 transition transform hover:scale-110"
-        >
-          <Users size={20} /> About Us
-        </Link>
+        <p className="mt-3 text-lg font-bold text-white drop-shadow-lg">
+          PRESS PLAY TO START
+        </p>
       </div>
 
-      {/* 🔧 Animasi custom */}
-      <style jsx>{`
-        @keyframes sway {
-          0%,
-          100% {
-            transform: translateY(-50%) rotate(0deg);
-          }
-          50% {
-            transform: translateY(-52%) rotate(2deg);
-          }
-        }
-        .animate-sway {
-          animation: sway 4s ease-in-out infinite;
-        }
-
-        @keyframes zoomSlow {
-          0%,
-          100% {
-            transform: scale(1);
-          }
-          50% {
-            transform: scale(1.05);
-          }
-        }
-        .animate-zoomSlow {
-          animation: zoomSlow 6s ease-in-out infinite;
-        }
-      `}</style>
+      {/* Gambar Overlap (Kipas) */}
+      <div className="flex justify-center items-end mt-16 mb-12">
+        {cardImages.map((card, i) => (
+          <div
+            key={i}
+            className={`relative -ml-20 first:ml-0 transition-transform duration-300 hover:scale-110`}
+            style={{
+              transform: `rotate(${i * 10 - 25}deg)`, // kipas lebih menyebar
+              zIndex: i,
+            }}
+          >
+            <Image
+              src={card.src}
+              alt={card.alt}
+              width={260}
+              height={360}
+              className="shadow-xl rounded-lg"
+            />
+          </div>
+        ))}
+      </div>
     </div>
   );
 }
