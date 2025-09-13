@@ -2,11 +2,12 @@
 
 import Link from "next/link";
 import Image from "next/image";
-import { useRef, useState } from "react";
+import { useState, useRef } from "react";
 import { Volume2, VolumeX } from "lucide-react";
 import { Jua } from "next/font/google";
 import { usePathname } from "next/navigation";
 
+// Font Jua
 const jua = Jua({
   weight: "400",
   subsets: ["latin"],
@@ -53,11 +54,9 @@ export default function AboutPage() {
       {/* Audio */}
       <audio ref={audioRef} src="/backsound.mp3" autoPlay loop />
 
-      {/* Navbar */}
+      {/* Navbar (konsisten sama homepage) */}
       <nav className="w-full flex items-center justify-between px-8 py-4 bg-[#D9D9D9]/20">
-        <div className="flex items-center">
-          <Image src="/logo.png" alt="Logo" width={70} height={70} />
-        </div>
+        <Image src="/logo.png" alt="Logo" width={70} height={70} />
 
         <ul className="flex gap-10 text-white text-lg font-medium">
           {navItems.map((item) => (
@@ -67,7 +66,7 @@ export default function AboutPage() {
                 className={`relative px-2 py-1 ${
                   pathname === item.path
                     ? "after:content-[''] after:absolute after:left-0 after:bottom-0 after:w-full after:h-[3px] after:bg-[#B45253]"
-                    : "hover:after:content-[''] hover:after:absolute hover:after:left-0 hover:after:bottom-0 hover:after:w-full hover:after:h-[3px] hover:after:bg-[#B45253] hover:after:scale-x-100 after:transition-transform after:duration-300"
+                    : "hover:after:content-[''] hover:after:absolute hover:after:left-0 hover:after:bottom-0 hover:w-full hover:h-[3px] hover:after:bg-[#B45253] after:transition-all after:duration-300"
                 }`}
               >
                 {item.name}
@@ -76,7 +75,6 @@ export default function AboutPage() {
           ))}
         </ul>
 
-        {/* Sound Button */}
         <button
           onClick={toggleMusic}
           className="p-3 rounded-full bg-[#FFE797] hover:bg-[#FCB53B] shadow-md transition"
@@ -90,30 +88,31 @@ export default function AboutPage() {
       </nav>
 
       {/* Judul */}
-      <div className="flex flex-col items-center mt-20"> {/* 🔽 Digeser lebih ke bawah */}
-        <h2 className="bg-[#FCB53B] text-white font-bold text-3xl px-10 py-3 rounded-full shadow-lg">
+      <div className="flex flex-col items-center mt-20">
+        <h2 className="bg-[#FCB53B] text-[#84994F] font-bold text-3xl px-10 py-3 rounded-full shadow-lg">
           Anggota Kelompok
         </h2>
       </div>
 
-      {/* Anggota Kelompok Grid 3 kolom */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-16 mt-20 px-10 place-items-center">
+      {/* Anggota Kelompok Grid */}
+      <div className="max-w-5xl mx-auto grid grid-cols-1 md:grid-cols-3 gap-10 mt-16 px-6 lg:px-12">
         {members.map((m, idx) => {
-          // selang-seling miring
-          const tilt = idx % 2 === 0 ? "-rotate-8" : "rotate-8";
+          const tilt = idx % 2 === 0 ? "-rotate-6" : "rotate-6";
           return (
             <div
               key={idx}
-              className="flex items-center gap-4 transform hover:scale-110 transition duration-300"
+              className="flex items-center gap-4 transform hover:scale-105 transition duration-300"
             >
+              {/* 🔽 Gambar diperkecil */}
               <Image
                 src={m.img}
                 alt={m.name}
-                width={90}
-                height={120}
-                className={`drop-shadow-lg ${tilt} hover:rotate-0 transition-transform duration-300`}
+                width={65}
+                height={85}
+                className={`drop-shadow-lg ${tilt} hover:rotate-0 transition-transform duration-300
+                            w-[50px] h-[70px] sm:w-[55px] sm:h-[75px] md:w-[60px] md:h-[80px] lg:w-[65px] lg:h-[85px]`}
               />
-              <p className="font-semibold text-lg drop-shadow-md text-[#FFE797]">
+              <p className="font-semibold text-xs md:text-sm lg:text-base text-[#FFE797] leading-snug">
                 {m.name}
               </p>
             </div>

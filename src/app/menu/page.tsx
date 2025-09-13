@@ -102,8 +102,8 @@ export default function MenuPage() {
           <Image
             src="/images/easy/klepon.png"
             alt="Easy"
-            width={50}
-            height={50}
+            width={32}
+            height={32}
             className="rotate-6"
           />
         </Link>
@@ -116,8 +116,8 @@ export default function MenuPage() {
           <Image
             src="/images/easy/pisjo.png"
             alt="Medium"
-            width={50}
-            height={50}
+            width={32}
+            height={32}
             className="-rotate-6"
           />
           <span>Medium</span>
@@ -132,8 +132,8 @@ export default function MenuPage() {
           <Image
             src="/images/easy/arumanis.png"
             alt="Hard"
-            width={50}
-            height={50}
+            width={32}
+            height={32}
             className="rotate-6"
           />
         </Link>

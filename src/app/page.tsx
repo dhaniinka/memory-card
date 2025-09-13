@@ -88,7 +88,7 @@ export default function HomePage() {
       </nav>
 
       {/* Title */}
-      <div className="flex flex-col items-center mt-20">
+      <div className="flex flex-col items-center mt-15">
         <h1 className="text-5xl font-bold text-[#FCB53B]">MEMORY GAME</h1>
         <Link
           href="/game/level/easy"
@@ -102,22 +102,26 @@ export default function HomePage() {
       </div>
 
       {/* Gambar Overlap (Kipas) */}
-      <div className="flex justify-center items-end mt-16 mb-12">
+      <div className="flex justify-center items-end mt-10 mb-8">
         {cardImages.map((card, i) => (
           <div
             key={i}
-            className={`relative -ml-20 first:ml-0 transition-transform duration-300 hover:scale-110`}
+            className={`relative -ml-10 first:ml-0 transition-transform duration-300 hover:scale-105`}
             style={{
-              transform: `rotate(${i * 10 - 25}deg)`, // kipas lebih menyebar
+              transform: `rotate(${i * 10 - 25}deg)`,
               zIndex: i,
             }}
           >
+            {/* Responsive ukuran kartu */}
             <Image
               src={card.src}
               alt={card.alt}
-              width={260}
-              height={360}
-              className="shadow-xl rounded-lg"
+              width={100}   // ukuran default di HP
+              height={140}
+              className="object-contain rounded-lg 
+                         sm:w-[120px] sm:h-[160px] 
+                         md:w-[140px] md:h-[190px] 
+                         lg:w-[160px] lg:h-[220px]"
             />
           </div>
         ))}
