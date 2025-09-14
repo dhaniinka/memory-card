@@ -2,10 +2,10 @@
 
 import Link from "next/link";
 import Image from "next/image";
-import { useState, useRef } from "react";
 import { Volume2, VolumeX } from "lucide-react";
 import { Jua } from "next/font/google";
 import { usePathname } from "next/navigation";
+import { useMusic } from "../musicprovider"; // ⬅️ musik global
 
 const jua = Jua({
   weight: "400",
@@ -13,16 +13,8 @@ const jua = Jua({
 });
 
 export default function GameInfoPage() {
-  const [isPlaying, setIsPlaying] = useState(true);
-  const audioRef = useRef<HTMLAudioElement>(null);
   const pathname = usePathname();
-
-  const toggleMusic = () => {
-    if (!audioRef.current) return;
-    if (isPlaying) audioRef.current.pause();
-    else audioRef.current.play();
-    setIsPlaying(!isPlaying);
-  };
+  const { isPlaying, toggleMusic } = useMusic();
 
   const navItems = [
     { name: "Home", path: "/" },
@@ -40,9 +32,6 @@ export default function GameInfoPage() {
         backgroundPosition: "center",
       }}
     >
-      {/* Musik */}
-      <audio ref={audioRef} src="/backsound.mp3" autoPlay loop />
-
       {/* Navbar */}
       <nav className="w-full flex items-center justify-between px-8 py-4 bg-[#D9D9D9]/20">
         <Image src="/logo.png" alt="Logo" width={70} height={70} />
@@ -86,7 +75,7 @@ export default function GameInfoPage() {
 
       {/* Container Steps */}
       <div className="flex flex-col gap-6 mt-8 px-4 max-w-5xl mx-auto mb-16">
-        {/* Baris 1 - 2 Step */}
+        {/* Baris 1 */}
         <div className="grid grid-cols-2 gap-4">
           {/* Step 1 */}
           <div className="bg-white/10 rounded-lg p-4 flex flex-col items-center">
@@ -117,7 +106,7 @@ export default function GameInfoPage() {
           </div>
         </div>
 
-        {/* Baris 2 - 3 Step */}
+        {/* Baris 2 */}
         <div className="grid grid-cols-3 gap-4">
           {/* Step 3 */}
           <div className="bg-white/10 rounded-lg p-4 flex flex-col items-center">

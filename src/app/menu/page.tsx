@@ -2,10 +2,10 @@
 
 import Link from "next/link";
 import Image from "next/image";
-import { useRef, useState } from "react";
 import { Volume2, VolumeX } from "lucide-react";
 import { Jua } from "next/font/google";
 import { usePathname } from "next/navigation";
+import { useMusic } from "../musicprovider"; // pakai musik global
 
 const jua = Jua({
   weight: "400",
@@ -13,16 +13,8 @@ const jua = Jua({
 });
 
 export default function MenuPage() {
-  const [isPlaying, setIsPlaying] = useState(true);
-  const audioRef = useRef<HTMLAudioElement>(null);
   const pathname = usePathname();
-
-  const toggleMusic = () => {
-    if (!audioRef.current) return;
-    if (isPlaying) audioRef.current.pause();
-    else audioRef.current.play();
-    setIsPlaying(!isPlaying);
-  };
+  const { isPlaying, toggleMusic } = useMusic();
 
   const navItems = [
     { name: "Home", path: "/" },
@@ -40,17 +32,10 @@ export default function MenuPage() {
         backgroundPosition: "center",
       }}
     >
-      {/* Audio */}
-      <audio ref={audioRef} src="/backsound.mp3" autoPlay loop />
-
       {/* Navbar */}
       <nav className="w-full flex items-center justify-between px-8 py-4 bg-[#D9D9D9]/20">
-        {/* Logo */}
-        <div className="flex items-center">
-          <Image src="/logo.png" alt="Logo" width={70} height={70} />
-        </div>
+        <Image src="/logo.png" alt="Logo" width={70} height={70} />
 
-        {/* Menu */}
         <ul className="flex gap-10 text-white text-lg font-medium">
           {navItems.map((item) => (
             <li key={item.name}>
@@ -59,7 +44,7 @@ export default function MenuPage() {
                 className={`relative px-2 py-1 ${
                   pathname === item.path
                     ? "after:content-[''] after:absolute after:left-0 after:bottom-0 after:w-full after:h-[3px] after:bg-[#B45253]"
-                    : "hover:after:content-[''] hover:after:absolute hover:after:left-0 hover:after:bottom-0 hover:after:w-full hover:after:h-[3px] hover:after:bg-[#B45253] hover:after:scale-x-100 after:transition-transform after:duration-300"
+                    : "hover:after:content-[''] hover:after:absolute hover:after:left-0 hover:after:bottom-0 hover:w-full hover:h-[3px] hover:after:bg-[#B45253] after:transition-all after:duration-300"
                 }`}
               >
                 {item.name}
@@ -68,7 +53,6 @@ export default function MenuPage() {
           ))}
         </ul>
 
-        {/* Sound Button */}
         <button
           onClick={toggleMusic}
           className="p-3 rounded-full bg-[#FFE797] hover:bg-[#FCB53B] shadow-md transition"
@@ -82,7 +66,7 @@ export default function MenuPage() {
       </nav>
 
       {/* Judul */}
-      <div className="flex flex-col items-center mt-15">
+      <div className="flex flex-col items-center mt-20">
         <h2 className="text-[#FCB53B] font-extrabold text-5xl drop-shadow-lg">
           CHOOSE LEVEL
         </h2>
@@ -138,6 +122,8 @@ export default function MenuPage() {
           />
         </Link>
       </div>
+
+      <div className="h-20"></div>
     </div>
   );
 }

@@ -2,10 +2,10 @@
 
 import Link from "next/link";
 import Image from "next/image";
-import { useState, useRef } from "react";
 import { Volume2, VolumeX } from "lucide-react";
 import { Jua } from "next/font/google";
 import { usePathname } from "next/navigation";
+import { useMusic } from "./musicprovider"; // ✅ pakai global music
 
 // Font Jua
 const jua = Jua({
@@ -14,16 +14,8 @@ const jua = Jua({
 });
 
 export default function HomePage() {
-  const [isPlaying, setIsPlaying] = useState(true);
-  const audioRef = useRef<HTMLAudioElement>(null);
   const pathname = usePathname();
-
-  const toggleMusic = () => {
-    if (!audioRef.current) return;
-    if (isPlaying) audioRef.current.pause();
-    else audioRef.current.play();
-    setIsPlaying(!isPlaying);
-  };
+  const { isPlaying, toggleMusic } = useMusic(); // ✅ ambil state dari provider
 
   const navItems = [
     { name: "Home", path: "/" },
@@ -35,10 +27,10 @@ export default function HomePage() {
   // list gambar
   const cardImages = [
     { src: "/images/easy/klepon.png", alt: "Klepon" },
-    { src: "/images/easy/arumanis.png", alt: "Arumanis" },
+    { src: "/images/medium/dewishinta.png", alt: "Arumanis" },
     { src: "/images/easy/risol.png", alt: "Risol" },
     { src: "/images/easy/pisjo.png", alt: "Pisang Ijo" },
-    { src: "/images/easy/pukis.png", alt: "Pukis" },
+    { src: "/images/hard/pa.png", alt: "Pukis" },
     { src: "/images/easy/serabi.png", alt: "Serabi" },
   ];
 
@@ -51,9 +43,6 @@ export default function HomePage() {
         backgroundPosition: "center",
       }}
     >
-      {/* Musik */}
-      <audio ref={audioRef} src="/backsound.mp3" autoPlay loop />
-
       {/* Navbar */}
       <nav className="w-full flex items-center justify-between px-8 py-4 bg-[#D9D9D9]/20">
         <Image src="/logo.png" alt="Logo" width={70} height={70} />
@@ -75,6 +64,7 @@ export default function HomePage() {
           ))}
         </ul>
 
+        {/* Tombol musik global */}
         <button
           onClick={toggleMusic}
           className="p-3 rounded-full bg-[#FFE797] hover:bg-[#FCB53B] shadow-md transition"
@@ -116,7 +106,7 @@ export default function HomePage() {
             <Image
               src={card.src}
               alt={card.alt}
-              width={100}   // ukuran default di HP
+              width={100}
               height={140}
               className="object-contain rounded-lg 
                          sm:w-[120px] sm:h-[160px] 

@@ -2,10 +2,10 @@
 
 import Link from "next/link";
 import Image from "next/image";
-import { useState, useRef } from "react";
 import { Volume2, VolumeX } from "lucide-react";
 import { Jua } from "next/font/google";
 import { usePathname } from "next/navigation";
+import { useMusic } from "../musicprovider"; // ⬅️ import hook dari provider
 
 // Font Jua
 const jua = Jua({
@@ -14,16 +14,8 @@ const jua = Jua({
 });
 
 export default function AboutPage() {
-  const [isPlaying, setIsPlaying] = useState(true);
-  const audioRef = useRef<HTMLAudioElement>(null);
   const pathname = usePathname();
-
-  const toggleMusic = () => {
-    if (!audioRef.current) return;
-    if (isPlaying) audioRef.current.pause();
-    else audioRef.current.play();
-    setIsPlaying(!isPlaying);
-  };
+  const { isPlaying, toggleMusic } = useMusic(); // ⬅️ ambil state musik global
 
   const navItems = [
     { name: "Home", path: "/" },
@@ -51,9 +43,6 @@ export default function AboutPage() {
         backgroundPosition: "center",
       }}
     >
-      {/* Audio */}
-      <audio ref={audioRef} src="/backsound.mp3" autoPlay loop />
-
       {/* Navbar (konsisten sama homepage) */}
       <nav className="w-full flex items-center justify-between px-8 py-4 bg-[#D9D9D9]/20">
         <Image src="/logo.png" alt="Logo" width={70} height={70} />

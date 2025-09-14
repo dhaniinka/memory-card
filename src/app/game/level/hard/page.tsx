@@ -1,7 +1,7 @@
 "use client";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import Link from "next/link";
-import { RefreshCcw, Home, Clock, Star } from "lucide-react";
+import { RefreshCcw, Home, Clock, Star, Volume2, VolumeX, PartyPopper } from "lucide-react";
 import Card from "../../../components/card";
 
 const baseCards = [
@@ -45,17 +45,21 @@ export default function HardLevel() {
   const [score, setScore] = useState(0);
   const [time, setTime] = useState(0);
   const [showWin, setShowWin] = useState(false);
-  const [showAll, setShowAll] = useState(true); // 🔥 preview mode
+  const [preview, setPreview] = useState(true);
 
-  const playMatchSound = () => new Audio("/sounds/match.mp3").play();
-  const playWinSound = () => new Audio("/sounds/win.mp3").play();
+  // 🔊 kontrol sound
+  const [soundOn, setSoundOn] = useState(true);
+  const levelSoundRef = useRef<HTMLAudioElement | null>(null);
+  const matchSoundRef = useRef<HTMLAudioElement | null>(null);
+  const wrongSoundRef = useRef<HTMLAudioElement | null>(null);
+  const winSoundRef = useRef<HTMLAudioElement | null>(null);
 
   useEffect(() => {
-    if (!showAll && !showWin) {
+    if (!preview && !showWin) {
       const timer = setInterval(() => setTime((t) => t + 1), 1000);
       return () => clearInterval(timer);
     }
-  }, [showAll, showWin]);
+  }, [preview, showWin]);
 
   const shuffleCards = () => {
     const shuffled = [...baseCards]
@@ -67,12 +71,17 @@ export default function HardLevel() {
     setScore(0);
     setTime(0);
     setShowWin(false);
-    setShowAll(true);
+    setPreview(true);
 
     // 🔥 5 detik preview semua kartu
     setTimeout(() => {
-      setShowAll(false);
+      setPreview(false);
     }, 5000);
+
+    // play level start sound
+    if (soundOn) {
+      levelSoundRef.current?.play();
+    }
   };
 
   useEffect(() => {
@@ -80,7 +89,7 @@ export default function HardLevel() {
   }, []);
 
   const handleChoice = (card: any) => {
-    if (!disabled && !showAll) {
+    if (!disabled && !preview) {
       firstChoice ? setSecondChoice(card) : setFirstChoice(card);
     }
   };
@@ -98,18 +107,19 @@ export default function HardLevel() {
           )
         );
         setScore((s) => s + 1);
-        playMatchSound();
-        resetTurn();
+        if (soundOn) matchSoundRef.current?.play();
+        setTimeout(resetTurn, 600); // match agak cepat
       } else {
-        setTimeout(() => resetTurn(), 1000);
+        if (soundOn) wrongSoundRef.current?.play();
+        setTimeout(resetTurn, 1200); // wrong agak lambat
       }
     }
   }, [firstChoice, secondChoice]);
 
   useEffect(() => {
     if (cards.length > 0 && cards.every((c) => c.matched)) {
-      playWinSound();
-      setTimeout(() => setShowWin(true), 500);
+      if (soundOn) winSoundRef.current?.play();
+      setTimeout(() => setShowWin(true), 600);
     }
   }, [cards]);
 
@@ -127,14 +137,28 @@ export default function HardLevel() {
       {/* Overlay */}
       <div className="absolute inset-0 bg-black/20" />
 
+      {/* 🔊 audio */}
+      <audio ref={levelSoundRef} src="/sounds/level3.mp3" />
+      <audio ref={matchSoundRef} src="/sounds/match.mp3" />
+      <audio ref={wrongSoundRef} src="/sounds/wrong.mp3" />
+      <audio ref={winSoundRef} src="/sounds/win.mp3" />
+
       {/* Header */}
       <div className="relative z-10 flex justify-between items-center w-full max-w-6xl px-6 py-4">
         <div className="bg-[#E78A8A] text-white px-4 py-2 rounded-full flex items-center gap-2">
           <Clock className="w-5 h-5" /> {time}s
         </div>
         <h2 className="text-3xl font-bold text-[#FCB53B]">LEVEL HARD</h2>
-        <div className="bg-[#E78A8A] text-white px-4 py-2 rounded-full flex items-center gap-2">
-          <Star className="w-5 h-5" /> {score}
+        <div className="flex items-center gap-3">
+          <div className="bg-[#E78A8A] text-white px-4 py-2 rounded-full flex items-center gap-2">
+            <Star className="w-5 h-5" /> {score}
+          </div>
+          <button
+            onClick={() => setSoundOn((s) => !s)}
+            className="p-2 bg-white rounded-full shadow hover:scale-110 transition"
+          >
+            {soundOn ? <Volume2 className="w-5 h-5 text-[#B45253]" /> : <VolumeX className="w-5 h-5 text-gray-400" />}
+          </button>
         </div>
       </div>
 
@@ -142,7 +166,7 @@ export default function HardLevel() {
       <div className="relative z-10 grid grid-cols-10 grid-rows-3 gap-3 mt-6">
         {cards.map((card) => {
           const isFlipped =
-            showAll || card.matched || card === firstChoice || card === secondChoice;
+            preview || card.matched || card === firstChoice || card === secondChoice;
           return (
             <Card
               key={card.id}
@@ -174,8 +198,8 @@ export default function HardLevel() {
       {showWin && (
         <div className="absolute inset-0 flex items-center justify-center bg-black/50 z-20">
           <div className="bg-white rounded-2xl shadow-xl p-10 text-center max-w-md">
-            <h2 className="text-2xl font-bold text-[#FCB53B] mb-4">
-              🎉 Congrats!
+            <h2 className="text-2xl font-bold text-[#FCB53B] mb-4 flex items-center justify-center gap-2">
+              <PartyPopper className="w-6 h-6 text-[#FCB53B]" /> Congrats!
             </h2>
             <p className="mb-6 text-gray-600">
               Kamu berhasil menamatkan Level Hard!
