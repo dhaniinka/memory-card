@@ -29,17 +29,20 @@ export default function MediumLevel() {
   const [time, setTime] = useState(0);
   const [gameOver, setGameOver] = useState(false);
 
+  // ✅ state tambahan untuk preview awal
+  const [preview, setPreview] = useState(true);
+
   const matchSoundRef = useRef<HTMLAudioElement | null>(null);
   const winSoundRef = useRef<HTMLAudioElement | null>(null);
 
-  // Timer
+  // Timer jalan hanya setelah preview selesai
   useEffect(() => {
-    if (gameOver) return;
+    if (gameOver || preview) return;
     const timer = setInterval(() => {
       setTime((t) => t + 1);
     }, 1000);
     return () => clearInterval(timer);
-  }, [gameOver]);
+  }, [gameOver, preview]);
 
   // Shuffle kartu
   const shuffleCards = () => {
@@ -52,6 +55,12 @@ export default function MediumLevel() {
     setScore(0);
     setTime(0);
     setGameOver(false);
+    setPreview(true);
+
+    // Tutup semua kartu otomatis setelah 4 detik
+    setTimeout(() => {
+      setPreview(false);
+    }, 4000);
   };
 
   useEffect(() => {
@@ -60,7 +69,7 @@ export default function MediumLevel() {
 
   // Handle pilihan kartu
   const handleChoice = (card: any) => {
-    if (!disabled && !card.matched && card !== firstChoice) {
+    if (!disabled && !card.matched && card !== firstChoice && !preview) {
       firstChoice ? setSecondChoice(card) : setFirstChoice(card);
     }
   };
@@ -100,18 +109,26 @@ export default function MediumLevel() {
   };
 
   return (
-    <div className="flex flex-col items-center justify-center min-h-screen bg-white relative">
+    <div
+      className="flex flex-col items-center justify-center min-h-screen relative bg-cover bg-center"
+      style={{ backgroundImage: "url('/bg-merah.png')" }}
+    >
+      {/* Overlay biar konten jelas */}
+      <div className="absolute inset-0 bg-black/20" />
+
       {/* Suara */}
       <audio ref={matchSoundRef} src="/sounds/match.mp3" />
       <audio ref={winSoundRef} src="/sounds/win.mp3" />
 
       {/* Header */}
-      <div className="flex justify-between items-center w-full max-w-4xl px-6 py-4">
-        <div className="bg-[#E78A8A] text-white px-4 py-2 rounded-full flex items-center gap-2">
+      <div className="relative z-10 flex justify-between items-center w-full max-w-4xl px-6 py-4">
+        <div className="bg-[#E78A8A] text-white px-4 py-2 rounded-full flex items-center gap-2 shadow-md">
           <Clock className="w-5 h-5" /> {time}s
         </div>
-        <h2 className="text-3xl font-bold text-[#FCB53B]">LEVEL MEDIUM</h2>
-        <div className="bg-[#E78A8A] text-white px-4 py-2 rounded-full flex items-center gap-2">
+        <h2 className="text-3xl font-bold text-[#FCB53B] uppercase drop-shadow-md">
+          LEVEL MEDIUM
+        </h2>
+        <div className="bg-[#E78A8A] text-white px-4 py-2 rounded-full flex items-center gap-2 shadow-md">
           <Star className="w-5 h-5" /> {score}
         </div>
       </div>
@@ -119,6 +136,7 @@ export default function MediumLevel() {
       {/* Grid kartu → dinamis & responsif */}
       <div
         className="
+          relative z-10
           grid 
           grid-cols-4 sm:grid-cols-6 lg:grid-cols-8 
           gap-3 sm:gap-4 lg:gap-6 
@@ -127,7 +145,7 @@ export default function MediumLevel() {
       >
         {cards.map((card) => {
           const isFlipped =
-            card.matched || card === firstChoice || card === secondChoice;
+            preview || card.matched || card === firstChoice || card === secondChoice;
           return (
             <div
               key={card.id}
@@ -148,7 +166,7 @@ export default function MediumLevel() {
       </div>
 
       {/* Tombol bawah */}
-      <div className="flex gap-6 mt-10">
+      <div className="relative z-10 flex gap-6 mt-10">
         <button
           onClick={shuffleCards}
           className="px-6 py-3 bg-[#B45253] text-white rounded-full font-bold shadow-lg hover:scale-105 transition flex items-center gap-2"
@@ -165,9 +183,9 @@ export default function MediumLevel() {
 
       {/* Pop-up Congrats */}
       {gameOver && (
-        <div className="absolute inset-0 flex items-center justify-center bg-black/60">
+        <div className="absolute inset-0 flex items-center justify-center bg-black/60 z-20">
           <div className="bg-white rounded-2xl p-8 text-center shadow-xl">
-            <h2 className="text-3xl font-bold text-[#FCB53B] flex items-center justify-center gap-2">
+            <h2 className="text-3xl font-bold text-[#FCB53B] flex items-center justify-center gap-2 drop-shadow-md">
               <PartyPopper className="w-6 h-6 text-[#FCB53B]" /> Congrats!
             </h2>
             <p className="mt-2 text-lg text-gray-700">
@@ -179,7 +197,7 @@ export default function MediumLevel() {
             <div className="flex gap-4 justify-center mt-6">
               <Link
                 href="/game/level/hard"
-                className="px-5 py-2 bg-[#B45253] text-white rounded-full shadow-md hover:scale-105 transition"
+                className="px-5 py-2 bg-[#4CAF50] text-white rounded-full shadow-md hover:scale-105 transition"
               >
                 Lanjut Level Berikutnya
               </Link>

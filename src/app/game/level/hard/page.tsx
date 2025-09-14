@@ -29,7 +29,7 @@ const baseCards = [
   { pairId: "ba", src: "/images/hard/ba-latin.png", matched: false },
   { pairId: "pa", src: "/images/hard/pa.png", matched: false },
   { pairId: "pa", src: "/images/hard/pa-latin.png", matched: false },
-  { pairId: "ya", src: "/images/hard/ya.png", matched: false },
+  { pairId: "ya", src: "/images/hard/ya.jpeg", matched: false },
   { pairId: "ya", src: "/images/hard/ya-latin.png", matched: false },
   { pairId: "la", src: "/images/hard/la.png", matched: false },
   { pairId: "la", src: "/images/hard/la-latin.png", matched: false },
@@ -45,14 +45,17 @@ export default function HardLevel() {
   const [score, setScore] = useState(0);
   const [time, setTime] = useState(0);
   const [showWin, setShowWin] = useState(false);
+  const [showAll, setShowAll] = useState(true); // 🔥 preview mode
 
   const playMatchSound = () => new Audio("/sounds/match.mp3").play();
   const playWinSound = () => new Audio("/sounds/win.mp3").play();
 
   useEffect(() => {
-    const timer = setInterval(() => setTime((t) => t + 1), 1000);
-    return () => clearInterval(timer);
-  }, []);
+    if (!showAll && !showWin) {
+      const timer = setInterval(() => setTime((t) => t + 1), 1000);
+      return () => clearInterval(timer);
+    }
+  }, [showAll, showWin]);
 
   const shuffleCards = () => {
     const shuffled = [...baseCards]
@@ -64,6 +67,12 @@ export default function HardLevel() {
     setScore(0);
     setTime(0);
     setShowWin(false);
+    setShowAll(true);
+
+    // 🔥 5 detik preview semua kartu
+    setTimeout(() => {
+      setShowAll(false);
+    }, 5000);
   };
 
   useEffect(() => {
@@ -71,7 +80,9 @@ export default function HardLevel() {
   }, []);
 
   const handleChoice = (card: any) => {
-    if (!disabled) firstChoice ? setSecondChoice(card) : setFirstChoice(card);
+    if (!disabled && !showAll) {
+      firstChoice ? setSecondChoice(card) : setFirstChoice(card);
+    }
   };
 
   useEffect(() => {
@@ -109,9 +120,15 @@ export default function HardLevel() {
   };
 
   return (
-    <div className="flex flex-col items-center justify-center min-h-screen bg-white relative">
+    <div
+      className="flex flex-col items-center justify-center min-h-screen relative bg-cover bg-center"
+      style={{ backgroundImage: "url('/bg-merah.png')" }}
+    >
+      {/* Overlay */}
+      <div className="absolute inset-0 bg-black/20" />
+
       {/* Header */}
-      <div className="flex justify-between items-center w-full max-w-6xl px-6 py-4">
+      <div className="relative z-10 flex justify-between items-center w-full max-w-6xl px-6 py-4">
         <div className="bg-[#E78A8A] text-white px-4 py-2 rounded-full flex items-center gap-2">
           <Clock className="w-5 h-5" /> {time}s
         </div>
@@ -122,10 +139,10 @@ export default function HardLevel() {
       </div>
 
       {/* Grid kartu */}
-      <div className="grid grid-cols-10 grid-rows-3 gap-3 mt-6">
+      <div className="relative z-10 grid grid-cols-10 grid-rows-3 gap-3 mt-6">
         {cards.map((card) => {
           const isFlipped =
-            card.matched || card === firstChoice || card === secondChoice;
+            showAll || card.matched || card === firstChoice || card === secondChoice;
           return (
             <Card
               key={card.id}
@@ -138,7 +155,7 @@ export default function HardLevel() {
       </div>
 
       {/* Tombol bawah */}
-      <div className="flex gap-6 mt-10">
+      <div className="relative z-10 flex gap-6 mt-10">
         <button
           onClick={shuffleCards}
           className="px-6 py-3 bg-[#B45253] text-white rounded-full font-bold shadow-lg hover:scale-105 transition flex items-center gap-2"
@@ -155,7 +172,7 @@ export default function HardLevel() {
 
       {/* Pop-up Win */}
       {showWin && (
-        <div className="absolute inset-0 flex items-center justify-center bg-black/50">
+        <div className="absolute inset-0 flex items-center justify-center bg-black/50 z-20">
           <div className="bg-white rounded-2xl shadow-xl p-10 text-center max-w-md">
             <h2 className="text-2xl font-bold text-[#FCB53B] mb-4">
               🎉 Congrats!
