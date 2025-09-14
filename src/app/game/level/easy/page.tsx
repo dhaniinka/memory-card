@@ -1,7 +1,16 @@
 "use client";
 import { useEffect, useState, useRef } from "react";
 import Link from "next/link";
-import { RefreshCcw, Home, Clock, Star } from "lucide-react";
+import Image from "next/image";
+import {
+  RefreshCcw,
+  Home,
+  Clock,
+  Star,
+  CheckCircle,
+  XCircle,
+  PartyPopper,
+} from "lucide-react";
 import Card from "../../../components/card"; // pastikan path sesuai
 
 const cardImages = [
@@ -13,7 +22,17 @@ const cardImages = [
   { src: "/images/easy/serabi.png", matched: false },
 ];
 
+// ✅ mapping level -> next level
+const nextLevelMap: Record<string, string | null> = {
+  easy: "medium",
+  medium: "hard",
+  hard: null,
+};
+
 export default function EasyLevel() {
+  const level = "easy"; // ⬅️ ubah sesuai file
+  const nextLevel = nextLevelMap[level];
+
   const [cards, setCards] = useState<any[]>([]);
   const [firstChoice, setFirstChoice] = useState<any>(null);
   const [secondChoice, setSecondChoice] = useState<any>(null);
@@ -22,17 +41,28 @@ export default function EasyLevel() {
   const [time, setTime] = useState(0);
   const [gameOver, setGameOver] = useState(false);
 
+  const [showInfo, setShowInfo] = useState(true);
+  const [dontShowAgain, setDontShowAgain] = useState(false);
+
   const matchSoundRef = useRef<HTMLAudioElement | null>(null);
   const winSoundRef = useRef<HTMLAudioElement | null>(null);
 
+  // ✅ cek sessionStorage
+  useEffect(() => {
+    const hideInfo = sessionStorage.getItem("hideGameInfo");
+    if (hideInfo === "true") {
+      setShowInfo(false);
+    }
+  }, []);
+
   // Timer
   useEffect(() => {
-    if (gameOver) return;
+    if (gameOver || showInfo) return;
     const timer = setInterval(() => {
       setTime((t) => t + 1);
     }, 1000);
     return () => clearInterval(timer);
-  }, [gameOver]);
+  }, [gameOver, showInfo]);
 
   // Shuffle kartu
   const shuffleCards = () => {
@@ -51,7 +81,7 @@ export default function EasyLevel() {
     shuffleCards();
   }, []);
 
-  // Handle pilihan kartu
+  // Pilih kartu
   const handleChoice = (card: any) => {
     if (!disabled && !card.matched && card !== firstChoice) {
       firstChoice ? setSecondChoice(card) : setFirstChoice(card);
@@ -69,9 +99,7 @@ export default function EasyLevel() {
           )
         );
         setScore((prev) => prev + 1);
-
         matchSoundRef.current?.play();
-
         resetTurn();
       } else {
         setTimeout(() => resetTurn(), 1000);
@@ -87,11 +115,18 @@ export default function EasyLevel() {
     }
   }, [cards]);
 
-  // Reset pilihan
   const resetTurn = () => {
     setFirstChoice(null);
     setSecondChoice(null);
     setDisabled(false);
+  };
+
+  // Tutup popup info
+  const handleStart = () => {
+    if (dontShowAgain) {
+      sessionStorage.setItem("hideGameInfo", "true");
+    }
+    setShowInfo(false);
   };
 
   return (
@@ -105,7 +140,9 @@ export default function EasyLevel() {
         <div className="bg-[#E78A8A] text-white px-4 py-2 rounded-full flex items-center gap-2">
           <Clock className="w-5 h-5" /> {time}s
         </div>
-        <h2 className="text-3xl font-bold text-[#FCB53B]">LEVEL EASY</h2>
+        <h2 className="text-3xl font-bold text-[#FCB53B] uppercase">
+          LEVEL {level}
+        </h2>
         <div className="bg-[#E78A8A] text-white px-4 py-2 rounded-full flex items-center gap-2">
           <Star className="w-5 h-5" /> {score}
         </div>
@@ -147,7 +184,9 @@ export default function EasyLevel() {
       {gameOver && (
         <div className="absolute inset-0 flex items-center justify-center bg-black/60">
           <div className="bg-white rounded-2xl p-8 text-center shadow-xl">
-            <h2 className="text-3xl font-bold text-[#FCB53B]">🎉 Congrats!</h2>
+            <h2 className="text-3xl font-bold text-[#FCB53B] flex items-center justify-center gap-2">
+              <PartyPopper className="w-7 h-7 text-[#FCB53B]" /> Congrats!
+            </h2>
             <p className="mt-2 text-lg text-gray-700">
               Kamu berhasil menyelesaikan level ini.
             </p>
@@ -155,12 +194,22 @@ export default function EasyLevel() {
               Waktu: {time}s | Skor: {score}
             </p>
             <div className="flex gap-4 justify-center mt-6">
-              <button
-                onClick={shuffleCards}
-                className="px-5 py-2 bg-[#B45253] text-white rounded-full shadow-md hover:scale-105 transition"
-              >
-                Main Lagi
-              </button>
+              {nextLevel ? (
+                <Link
+                  href={`/game/level/${nextLevel}`}
+                  className="px-5 py-2 bg-[#4CAF50] text-white rounded-full shadow-md hover:scale-105 transition"
+                >
+                  Lanjut Level{" "}
+                  {nextLevel.charAt(0).toUpperCase() + nextLevel.slice(1)}
+                </Link>
+              ) : (
+                <button
+                  onClick={shuffleCards}
+                  className="px-5 py-2 bg-[#B45253] text-white rounded-full shadow-md hover:scale-105 transition"
+                >
+                  Main Lagi
+                </button>
+              )}
               <Link
                 href="/menu"
                 className="px-5 py-2 bg-[#FCB53B] text-white rounded-full shadow-md hover:scale-105 transition"

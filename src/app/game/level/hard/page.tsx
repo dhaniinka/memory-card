@@ -2,27 +2,39 @@
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import { RefreshCcw, Home, Clock, Star } from "lucide-react";
-import Card from "../../../components/card"; // pastikan path sesuai
+import Card from "../../../components/card";
 
-const cardImages = [
-  { src: "/images/hard/klepon.png", matched: false },
-  { src: "/images/hard/arumanis.png", matched: false },
-  { src: "/images/hard/pisjo.png", matched: false },
-  { src: "/images/hard/pukis.png", matched: false },
-  { src: "/images/hard/risol.png", matched: false },
-  { src: "/images/hard/serabi.png", matched: false },
-  { src: "/images/hard/lupis.png", matched: false },
-  { src: "/images/hard/cenil.png", matched: false },
-  { src: "/images/hard/dadar.png", matched: false },
-  { src: "/images/hard/wajik.png", matched: false },
-  { src: "/images/hard/getuk.png", matched: false },
-  { src: "/images/hard/ondeonde.png", matched: false },
-  { src: "/images/hard/kueku.png", matched: false },
-  { src: "/images/hard/apem.png", matched: false },
-  { src: "/images/hard/nagasari.png", matched: false },
-  { src: "/images/hard/klethik.png", matched: false },
-  { src: "/images/hard/lapis.png", matched: false },
-  { src: "/images/hard/kueputu.png", matched: false },
+const baseCards = [
+  { pairId: "ha", src: "/images/hard/ha.png", matched: false },
+  { pairId: "ha", src: "/images/hard/ha-latin.png", matched: false },
+  { pairId: "na", src: "/images/hard/na.png", matched: false },
+  { pairId: "na", src: "/images/hard/na-latin.png", matched: false },
+  { pairId: "ca", src: "/images/hard/ca.png", matched: false },
+  { pairId: "ca", src: "/images/hard/ca-latin.png", matched: false },
+  { pairId: "ra", src: "/images/hard/ra.png", matched: false },
+  { pairId: "ra", src: "/images/hard/ra-latin.png", matched: false },
+  { pairId: "ka", src: "/images/hard/ka.png", matched: false },
+  { pairId: "ka", src: "/images/hard/ka-latin.png", matched: false },
+  { pairId: "da", src: "/images/hard/da.png", matched: false },
+  { pairId: "da", src: "/images/hard/da-latin.png", matched: false },
+  { pairId: "ta", src: "/images/hard/ta.png", matched: false },
+  { pairId: "ta", src: "/images/hard/ta-latin.png", matched: false },
+  { pairId: "sa", src: "/images/hard/sa.png", matched: false },
+  { pairId: "sa", src: "/images/hard/sa-latin.png", matched: false },
+  { pairId: "ma", src: "/images/hard/ma.png", matched: false },
+  { pairId: "ma", src: "/images/hard/ma-latin.png", matched: false },
+  { pairId: "ga", src: "/images/hard/ga.png", matched: false },
+  { pairId: "ga", src: "/images/hard/ga-latin.png", matched: false },
+  { pairId: "ba", src: "/images/hard/ba.png", matched: false },
+  { pairId: "ba", src: "/images/hard/ba-latin.png", matched: false },
+  { pairId: "pa", src: "/images/hard/pa.png", matched: false },
+  { pairId: "pa", src: "/images/hard/pa-latin.png", matched: false },
+  { pairId: "ya", src: "/images/hard/ya.png", matched: false },
+  { pairId: "ya", src: "/images/hard/ya-latin.png", matched: false },
+  { pairId: "la", src: "/images/hard/la.png", matched: false },
+  { pairId: "la", src: "/images/hard/la-latin.png", matched: false },
+  { pairId: "wa", src: "/images/hard/wa.png", matched: false },
+  { pairId: "wa", src: "/images/hard/wa-latin.png", matched: false },
 ];
 
 export default function HardLevel() {
@@ -32,59 +44,49 @@ export default function HardLevel() {
   const [disabled, setDisabled] = useState(false);
   const [score, setScore] = useState(0);
   const [time, setTime] = useState(0);
+  const [showWin, setShowWin] = useState(false);
 
-  // Suara
-  const playMatchSound = () => {
-    const audio = new Audio("/sounds/match.mp3");
-    audio.play();
-  };
-  const playWinSound = () => {
-    const audio = new Audio("/sounds/win.mp3");
-    audio.play();
-  };
+  const playMatchSound = () => new Audio("/sounds/match.mp3").play();
+  const playWinSound = () => new Audio("/sounds/win.mp3").play();
 
-  // Timer
   useEffect(() => {
-    const timer = setInterval(() => {
-      setTime((t) => t + 1);
-    }, 1000);
+    const timer = setInterval(() => setTime((t) => t + 1), 1000);
     return () => clearInterval(timer);
   }, []);
 
-  // Shuffle kartu
   const shuffleCards = () => {
-    const shuffledCards = [...cardImages, ...cardImages]
+    const shuffled = [...baseCards]
       .sort(() => Math.random() - 0.5)
-      .map((card) => ({ ...card, id: Math.random() }));
-    setCards(shuffledCards);
+      .map((c) => ({ ...c, id: Math.random() }));
+    setCards(shuffled);
     setFirstChoice(null);
     setSecondChoice(null);
     setScore(0);
     setTime(0);
+    setShowWin(false);
   };
 
   useEffect(() => {
     shuffleCards();
   }, []);
 
-  // Handle pilihan kartu
   const handleChoice = (card: any) => {
-    if (!disabled) {
-      firstChoice ? setSecondChoice(card) : setFirstChoice(card);
-    }
+    if (!disabled) firstChoice ? setSecondChoice(card) : setFirstChoice(card);
   };
 
-  // Bandingkan kartu
   useEffect(() => {
     if (firstChoice && secondChoice) {
       setDisabled(true);
-      if (firstChoice.src === secondChoice.src) {
-        setCards((prevCards) =>
-          prevCards.map((card) =>
-            card.src === firstChoice.src ? { ...card, matched: true } : card
+      if (
+        firstChoice.pairId === secondChoice.pairId &&
+        firstChoice.id !== secondChoice.id
+      ) {
+        setCards((prev) =>
+          prev.map((c) =>
+            c.pairId === firstChoice.pairId ? { ...c, matched: true } : c
           )
         );
-        setScore((prev) => prev + 1);
+        setScore((s) => s + 1);
         playMatchSound();
         resetTurn();
       } else {
@@ -93,17 +95,13 @@ export default function HardLevel() {
     }
   }, [firstChoice, secondChoice]);
 
-  // Cek kalau menang
   useEffect(() => {
-    if (cards.length > 0 && cards.every((card) => card.matched)) {
+    if (cards.length > 0 && cards.every((c) => c.matched)) {
       playWinSound();
-      setTimeout(() => {
-        alert("🎉 Congrats! Kamu berhasil menamatkan Level Hard!");
-      }, 500);
+      setTimeout(() => setShowWin(true), 500);
     }
   }, [cards]);
 
-  // Reset pilihan
   const resetTurn = () => {
     setFirstChoice(null);
     setSecondChoice(null);
@@ -111,9 +109,9 @@ export default function HardLevel() {
   };
 
   return (
-    <div className="flex flex-col items-center justify-center min-h-screen bg-white">
+    <div className="flex flex-col items-center justify-center min-h-screen bg-white relative">
       {/* Header */}
-      <div className="flex justify-between items-center w-full max-w-5xl px-6 py-4">
+      <div className="flex justify-between items-center w-full max-w-6xl px-6 py-4">
         <div className="bg-[#E78A8A] text-white px-4 py-2 rounded-full flex items-center gap-2">
           <Clock className="w-5 h-5" /> {time}s
         </div>
@@ -124,7 +122,7 @@ export default function HardLevel() {
       </div>
 
       {/* Grid kartu */}
-      <div className="grid grid-cols-6 gap-4 mt-6">
+      <div className="grid grid-cols-10 grid-rows-3 gap-3 mt-6">
         {cards.map((card) => {
           const isFlipped =
             card.matched || card === firstChoice || card === secondChoice;
@@ -154,6 +152,26 @@ export default function HardLevel() {
           <Home className="w-5 h-5" /> Menu
         </Link>
       </div>
+
+      {/* Pop-up Win */}
+      {showWin && (
+        <div className="absolute inset-0 flex items-center justify-center bg-black/50">
+          <div className="bg-white rounded-2xl shadow-xl p-10 text-center max-w-md">
+            <h2 className="text-2xl font-bold text-[#FCB53B] mb-4">
+              🎉 Congrats!
+            </h2>
+            <p className="mb-6 text-gray-600">
+              Kamu berhasil menamatkan Level Hard!
+            </p>
+            <Link
+              href="/menu"
+              className="px-6 py-3 bg-[#FCB53B] text-white rounded-full font-bold shadow-lg hover:scale-105 transition"
+            >
+              Back to Menu
+            </Link>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

@@ -18,16 +18,21 @@ export default function Card({ card, isFlipped, handleChoice }: CardProps) {
 
   return (
     <div
-      className="w-24 aspect-[3/4] sm:w-28 md:w-32 cursor-pointer relative perspective"
+      className="w-24 aspect-[3/4] sm:w-28 md:w-32 cursor-pointer relative"
       onClick={handleClick}
+      style={{ perspective: 1000 }}
     >
       <motion.div
-        className="relative w-full h-full preserve-3d"
+        className="relative w-full h-full"
         animate={{ rotateY: isFlipped ? 180 : 0 }}
         transition={{ duration: 0.6 }}
+        style={{ transformStyle: "preserve-3d" }}
       >
-        {/* Back */}
-        <div className="absolute w-full h-full backface-hidden">
+        {/* Back side */}
+        <div
+          className="absolute w-full h-full"
+          style={{ backfaceVisibility: "hidden" }}
+        >
           <Image
             src="/back.png"
             alt="back card"
@@ -36,8 +41,14 @@ export default function Card({ card, isFlipped, handleChoice }: CardProps) {
           />
         </div>
 
-        {/* Front */}
-        <div className="absolute w-full h-full rotate-y-180 backface-hidden">
+        {/* Front side */}
+        <div
+          className="absolute w-full h-full"
+          style={{
+            backfaceVisibility: "hidden",
+            transform: "rotateY(180deg)",
+          }}
+        >
           <Image
             src={card.src}
             alt="front card"

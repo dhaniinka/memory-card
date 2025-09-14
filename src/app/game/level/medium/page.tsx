@@ -1,23 +1,23 @@
 "use client";
 import { useEffect, useState, useRef } from "react";
 import Link from "next/link";
-import { RefreshCcw, Home, Clock, Star } from "lucide-react";
+import { RefreshCcw, Home, Clock, Star, PartyPopper } from "lucide-react";
 import Card from "../../../components/card"; // pastikan path sesuai
 
 // Daftar gambar level Medium
 const cardImages = [
-  { src: "/images/medium/klepon.png", matched: false },
-  { src: "/images/medium/arumanis.png", matched: false },
-  { src: "/images/medium/pisjo.png", matched: false },
-  { src: "/images/medium/pukis.png", matched: false },
-  { src: "/images/medium/risol.png", matched: false },
-  { src: "/images/medium/serabi.png", matched: false },
-  { src: "/images/medium/getuk.png", matched: false },
-  { src: "/images/medium/lupis.png", matched: false },
-  { src: "/images/medium/onde.png", matched: false },
-  { src: "/images/medium/cireng.png", matched: false },
-  { src: "/images/medium/bolu.png", matched: false },
-  { src: "/images/medium/putu.png", matched: false },
+  { src: "/images/medium/bagong.png", matched: false },
+  { src: "/images/medium/dewishinta.png", matched: false },
+  { src: "/images/medium/gatotkaca.png", matched: false },
+  { src: "/images/medium/petruk.png", matched: false },
+  { src: "/images/medium/prabudasarata.png", matched: false },
+  { src: "/images/medium/prabudewanata.png", matched: false },
+  { src: "/images/medium/praburama.png", matched: false },
+  { src: "/images/medium/rahwana.png", matched: false },
+  { src: "/images/medium/semar.png", matched: false },
+  { src: "/images/medium/srikresna.png", matched: false },
+  { src: "/images/medium/werkudara.png", matched: false },
+  { src: "/images/medium/gareng.png", matched: false },
 ];
 
 export default function MediumLevel() {
@@ -76,10 +76,7 @@ export default function MediumLevel() {
           )
         );
         setScore((prev) => prev + 1);
-
-        // mainkan suara match
         matchSoundRef.current?.play();
-
         resetTurn();
       } else {
         setTimeout(() => resetTurn(), 1000);
@@ -109,7 +106,7 @@ export default function MediumLevel() {
       <audio ref={winSoundRef} src="/sounds/win.mp3" />
 
       {/* Header */}
-      <div className="flex justify-between items-center w-full max-w-3xl px-6 py-4">
+      <div className="flex justify-between items-center w-full max-w-4xl px-6 py-4">
         <div className="bg-[#E78A8A] text-white px-4 py-2 rounded-full flex items-center gap-2">
           <Clock className="w-5 h-5" /> {time}s
         </div>
@@ -119,18 +116,33 @@ export default function MediumLevel() {
         </div>
       </div>
 
-      {/* Grid kartu */}
-      <div className="grid grid-cols-6 gap-4 mt-6">
+      {/* Grid kartu → dinamis & responsif */}
+      <div
+        className="
+          grid 
+          grid-cols-4 sm:grid-cols-6 lg:grid-cols-8 
+          gap-3 sm:gap-4 lg:gap-6 
+          mt-6 w-full max-w-6xl px-4
+        "
+      >
         {cards.map((card) => {
           const isFlipped =
             card.matched || card === firstChoice || card === secondChoice;
           return (
-            <Card
+            <div
               key={card.id}
-              card={card}
-              isFlipped={isFlipped}
-              handleChoice={handleChoice}
-            />
+              className="
+                aspect-[3/4] 
+                w-[clamp(70px,10vw,120px)] 
+                mx-auto
+              "
+            >
+              <Card
+                card={card}
+                isFlipped={isFlipped}
+                handleChoice={handleChoice}
+              />
+            </div>
           );
         })}
       </div>
@@ -155,7 +167,9 @@ export default function MediumLevel() {
       {gameOver && (
         <div className="absolute inset-0 flex items-center justify-center bg-black/60">
           <div className="bg-white rounded-2xl p-8 text-center shadow-xl">
-            <h2 className="text-3xl font-bold text-[#FCB53B]">🎉 Congrats!</h2>
+            <h2 className="text-3xl font-bold text-[#FCB53B] flex items-center justify-center gap-2">
+              <PartyPopper className="w-6 h-6 text-[#FCB53B]" /> Congrats!
+            </h2>
             <p className="mt-2 text-lg text-gray-700">
               Kamu berhasil menyelesaikan level ini.
             </p>
@@ -163,12 +177,12 @@ export default function MediumLevel() {
               Waktu: {time}s | Skor: {score}
             </p>
             <div className="flex gap-4 justify-center mt-6">
-              <button
-                onClick={shuffleCards}
+              <Link
+                href="/game/level/hard"
                 className="px-5 py-2 bg-[#B45253] text-white rounded-full shadow-md hover:scale-105 transition"
               >
-                Main Lagi
-              </button>
+                Lanjut Level Berikutnya
+              </Link>
               <Link
                 href="/menu"
                 className="px-5 py-2 bg-[#FCB53B] text-white rounded-full shadow-md hover:scale-105 transition"
