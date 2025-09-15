@@ -27,11 +27,11 @@ export default function AboutPage() {
   // Data anggota kelompok
   const members = [
     { name: "HAZEERA SYADZA ZUL ISLAMADINA (15)", img: "/images/easy/pisjo.png" },
-    { name: "HAZEERA SYADZA ZUL ISLAMADINA (15)", img: "/images/easy/klepon.png" },
-    { name: "HAZEERA SYADZA ZUL ISLAMADINA (15)", img: "/images/easy/pukis.png" },
-    { name: "HAZEERA SYADZA ZUL ISLAMADINA (15)", img: "/images/easy/arumanis.png" },
-    { name: "HAZEERA SYADZA ZUL ISLAMADINA (15)", img: "/images/easy/klepon.png" },
-    { name: "HAZEERA SYADZA ZUL ISLAMADINA (15)", img: "/images/easy/klepon.png" },
+    { name: "INKA NARARYA KARUNIAWARDHANI (16)", img: "/images/easy/klepon.png" },
+    { name: "MARITSA KHANSA EVANTHE (21)", img: "/images/easy/pukis.png" },
+    { name: "NADIA HANA BELINDA (27)", img: "/images/easy/arumanis.png" },
+    { name: "SILVIA RESTA AUDITYAS (31)", img: "/images/easy/klepon.png" },
+    { name: "VANESHA MAULIDYA PRISTIANY (32)", img: "/images/easy/klepon.png" },
   ];
 
   return (

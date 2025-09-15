@@ -98,7 +98,7 @@ export default function MenuPage() {
           className="flex items-center justify-center gap-x-3 px-6 py-3 rounded-full bg-[#FCB53B] text-white font-bold text-xl shadow-md hover:scale-105 transition"
         >
           <Image
-            src="/images/easy/pisjo.png"
+            src="/images/medium/gatotkaca.png"
             alt="Medium"
             width={32}
             height={32}
@@ -114,7 +114,7 @@ export default function MenuPage() {
         >
           <span>Hard</span>
           <Image
-            src="/images/easy/arumanis.png"
+            src="/images/hard/ga.png"
             alt="Hard"
             width={32}
             height={32}
